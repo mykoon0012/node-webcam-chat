@@ -1,27 +1,27 @@
-const socket = io("/");
+const socket = io("/"); //ส่วนนี้จะเป็นการเรียกใช้กล้องและสร้างตัวแปรในการจัดหน้าตาต่างๆ
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
 const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header__back");
 myVideo.muted = true;
 
-backBtn.addEventListener("click", () => {
+backBtn.addEventListener("click", () => { //ส่วนนี้จะเป็นส่วนในการจัดหน้าตาของปุ่มต่างๆบนหน้าเว็บ
   document.querySelector(".main__left").style.display = "flex";
   document.querySelector(".main__left").style.flex = "1";
   document.querySelector(".main__right").style.display = "none";
   document.querySelector(".header__back").style.display = "none";
 });
 
-showChat.addEventListener("click", () => {
+showChat.addEventListener("click", () => { //ส่วนนี้จะเป็นส่วนในการจัดหน้าตาของแชทต่างๆบนหน้าเว็บ
   document.querySelector(".main__right").style.display = "flex";
   document.querySelector(".main__right").style.flex = "1";
   document.querySelector(".main__left").style.display = "none";
   document.querySelector(".header__back").style.display = "block";
 });
 
-const user = prompt("Enter your name");
+const user = prompt("Enter your name"); // code ส่วนนี้จะแจ้งเตื่อนขึ้นมาเมื่อเข้าไปในห้องแชท เพื่อในกรอกชื่อ
 
-var peer = new Peer({
+var peer = new Peer({ // สร้างตัวแปร ในการเก็บ host และport ต่างๆของ Peer
   host: '127.0.0.1',
   port: 3030,
   path: '/peerjs',
@@ -52,13 +52,13 @@ var peer = new Peer({
   debug: 3
 });
 
-let myVideoStream;
+let myVideoStream; // ส่วนนี้จะเป็นการอนุญาติในการใช้กล้อง และ ไมค์
 navigator.mediaDevices
   .getUserMedia({
     audio: true,
     video: true,
   })
-  .then((stream) => {
+  .then((stream) => { // ส่วนนี้จะเป็น code ที่เกี่ยวกับ webcam ในการ stream
     myVideoStream = stream;
     addVideoStream(myVideo, stream);
 
@@ -76,7 +76,7 @@ navigator.mediaDevices
     });
   });
 
-const connectToNewUser = (userId, stream) => {
+const connectToNewUser = (userId, stream) => { //ส่วนนี้จะเป็นการแสดงกล้องของคนที่เข้ามาในแชท
   console.log('I call someone' + userId);
   const call = peer.call(userId, stream);
   const video = document.createElement("video");
@@ -85,7 +85,7 @@ const connectToNewUser = (userId, stream) => {
   });
 };
 
-peer.on("open", (id) => {
+peer.on("open", (id) => { // เมื่อ กรอกชื่อเสร็จ จะทำการjoin โดยการใช้ตัวเเปร peer ในการเชื่อม server จาก id
   console.log('my id is' + id);
   socket.emit("join-room", ROOM_ID, id, user);
 });
@@ -102,24 +102,24 @@ let text = document.querySelector("#chat_message");
 let send = document.getElementById("send");
 let messages = document.querySelector(".messages");
 
-send.addEventListener("click", (e) => {
+send.addEventListener("click", (e) => { // ส่วนนี้เป็น code ในการส่งข้อความเมื่อกด Click
   if (text.value.length !== 0) {
     socket.emit("message", text.value);
     text.value = "";
   }
 });
 
-text.addEventListener("keydown", (e) => {
+text.addEventListener("keydown", (e) => { // ส่วนนี้เป็น code ในการส่งข้อความเมื่อกด Enter
   if (e.key === "Enter" && text.value.length !== 0) {
     socket.emit("message", text.value);
     text.value = "";
   }
 });
 
-const inviteButton = document.querySelector("#inviteButton");
-const muteButton = document.querySelector("#muteButton");
-const stopVideo = document.querySelector("#stopVideo");
-muteButton.addEventListener("click", () => {
+const inviteButton = document.querySelector("#inviteButton"); //สร้างตัวแปรเพื่อมาเก็บค่าของปุ่ม inviteButton
+const muteButton = document.querySelector("#muteButton");//สร้างตัวแปรเพื่อมาเก็บค่าของปุ่ม muteButton
+const stopVideo = document.querySelector("#stopVideo");//สร้างตัวแปรเพื่อมาเก็บค่าของปุ่ม stopVideo
+muteButton.addEventListener("click", () => {// ส่วนนี้จะเป็น code เกี่ยวกับการปิกเสียง/เปิดเสียง
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
   if (enabled) {
     myVideoStream.getAudioTracks()[0].enabled = false;
@@ -134,7 +134,7 @@ muteButton.addEventListener("click", () => {
   }
 });
 
-stopVideo.addEventListener("click", () => {
+stopVideo.addEventListener("click", () => { // ส่วนนี้จะเป็น code เกี่ยวกับการปิด/เปิดกล้อง
   const enabled = myVideoStream.getVideoTracks()[0].enabled;
   if (enabled) {
     myVideoStream.getVideoTracks()[0].enabled = false;
@@ -149,14 +149,14 @@ stopVideo.addEventListener("click", () => {
   }
 });
 
-inviteButton.addEventListener("click", (e) => {
+inviteButton.addEventListener("click", (e) => { // ส่วนนี้จะเป็น code เกี่ยวกับการ เชิญเพื่อนเข้ามาสนทนา
   prompt(
     "Copy this link and send it to people you want to meet with",
     window.location.href
   );
 });
 
-socket.on("createMessage", (message, userName) => {
+socket.on("createMessage", (message, userName) => { //ส่วนนี้จะเป็น code ในการสร้างข้อความมาแสดง และจะใช้ คำว่า me หน้าข้อความเพื่อจะได้รู้ว่าใครเป็นคนส่งข้อความ
   messages.innerHTML =
     messages.innerHTML +
     `<div class="message">
